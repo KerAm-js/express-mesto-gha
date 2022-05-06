@@ -29,4 +29,4 @@
 
 ## Ссылка на репозиторий
 
-https://github.com/KerAm-js/express-mesto-gha/settings
+https://github.com/KerAm-js/express-mesto-gha
