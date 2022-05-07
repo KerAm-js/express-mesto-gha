@@ -3,14 +3,14 @@ const { chooseError, isEntityFound } = require('../utils/utils');
 
 module.exports.getUsers = (req, res) => {
   User.find()
-    .then((user) => res.send(JSON.stringify(user)))
+    .then((user) => res.send(user))
     .catch((err) => res.status(500).send({ ...err }));
 };
 
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
-    .then((result) => res.status(201).send(JSON.stringify(result)))
+    .then((result) => res.status(201).send(result))
     .catch((err) => {
       const possibleErrors = [
         { name: 'ValidationError', message: 'Некорректные данные пользователя', code: 400 },
@@ -39,7 +39,7 @@ module.exports.updateProfile = (req, res) => {
     runValidators: true,
     upsert: false,
   })
-    .then((result) => isEntityFound(res, JSON.stringify(result), 'Пользователь не найден'))
+    .then((result) => isEntityFound(res, result, 'Пользователь не найден'))
     .catch((err) => {
       const possibleErrors = [
         { name: 'ValidationError', message: 'Некорректные данные профиля', code: 400 },
@@ -57,7 +57,7 @@ module.exports.updateAvatar = (req, res) => {
     runValidators: true,
     upsert: true,
   })
-    .then((result) => isEntityFound(res, JSON.stringify(result), 'Пользователь не найден'))
+    .then((result) => isEntityFound(res, result, 'Пользователь не найден'))
     .catch((err) => {
       const possibleErrors = [
         { name: 'CastError', message: 'Не корректный id пользователя', code: 400 },

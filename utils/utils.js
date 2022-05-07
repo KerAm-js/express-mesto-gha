@@ -3,7 +3,7 @@ module.exports.isEntityFound = (res, result, errorMessage) => {
     res.status(404).send({ message: errorMessage });
     return;
   }
-  res.send(JSON.stringify(result));
+  res.send(result);
 };
 
 module.exports.chooseError = (res, err, possibleErrors) => {
@@ -12,5 +12,5 @@ module.exports.chooseError = (res, err, possibleErrors) => {
     res.status(code).send({ message, ...err });
     return;
   }
-  res.status(500).send(JSON.stringify({ message: err.message, ...err }));
+  res.status(500).send({ message: err.message, ...err });
 };
