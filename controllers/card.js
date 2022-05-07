@@ -13,7 +13,7 @@ module.exports.deleteCardById = (req, res) => {
     .then((card) => isEntityFound(res, card, 'Карточка не найдена'))
     .catch((err) => {
       const possibleErrors = [
-        { name: 'ValidationError', message: 'Некорректные данные карточки', code: 400 },
+        { name: 'CastError', message: 'Некорректные данные карточки', code: 400 },
       ];
       chooseError(res, err, possibleErrors);
     });
