@@ -3,7 +3,7 @@ const { chooseError, isEntityFound } = require('../utils/utils');
 
 module.exports.getCards = (req, res) => {
   Card.find()
-    .then((cards) => res.send(cards))
+    .then((cards) => res.send(JSON.stringify(cards)))
     .catch((err) => res.status(500).send(err.message));
 };
 
@@ -18,7 +18,7 @@ module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
   const { _id } = req.user;
   Card.create({ name, link, owner: _id })
-    .then((result) => res.send(result))
+    .then((result) => res.send(JSON.stringify(result)))
     .catch((err) => {
       const possibleErrors = [
         { name: 'ValidationError', message: 'Некорректные данные карточки', code: 400 },

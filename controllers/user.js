@@ -3,14 +3,14 @@ const { chooseError, isEntityFound } = require('../utils/utils');
 
 module.exports.getUsers = (req, res) => {
   User.find()
-    .then((user) => res.send(user))
+    .then((user) => res.send(JSON.stringify(user)))
     .catch((err) => res.status(500).send(err.message));
 };
 
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
-    .then((result) => res.send(result))
+    .then((result) => res.send(JSON.stringify(result)))
     .catch((err) => {
       const possibleErrors = [
         { name: 'ValidationError', message: 'Некорректные данные пользователя', code: 400 },
@@ -22,7 +22,7 @@ module.exports.createUser = (req, res) => {
 module.exports.getUserById = (req, res) => {
   const { userId } = req.params;
   User.findById(userId)
-    .then((user) => isEntityFound(res, user, 'Пользователь не найден'))
+    .then((user) => isEntityFound(res, JSON.stringify(user), 'Пользователь не найден'))
     .catch((err) => {
       const possibleErrors = [
         { name: 'CastError', message: 'Некорректный id пользователя', code: 404 },
@@ -39,7 +39,7 @@ module.exports.updateProfile = (req, res) => {
     runValidators: true,
     upsert: false,
   })
-    .then((result) => isEntityFound(res, result, 'Пользователь не найден'))
+    .then((result) => isEntityFound(res, JSON.stringify(result), 'Пользователь не найден'))
     .catch((err) => {
       const possibleErrors = [
         { name: 'ValidationError', message: 'Некорректные данные профиля', code: 400 },
@@ -57,6 +57,11 @@ module.exports.updateAvatar = (req, res) => {
     runValidators: true,
     upsert: true,
   })
-    .then((result) => res.send(result))
-    .catch((err) => res.status(500).send(err.message));
+    .then((result) => isEntityFound(res, JSON.stringify(result), 'Пользователь не найден'))
+    .catch((err) => {
+      const possibleErrors = [
+        { name: 'CastError', message: 'Не корректный id пользователя', code: 400 },
+      ];
+      chooseError(res, err, possibleErrors);
+    });
 };
