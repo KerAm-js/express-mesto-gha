@@ -4,7 +4,7 @@ const { chooseError, isEntityFound } = require('../utils/utils');
 module.exports.getUsers = (req, res) => {
   User.find()
     .then((user) => res.send(user))
-    .catch((err) => res.status(500).send({ ...err }));
+    .catch((err) => res.status(500).send({ message: err.message }));
 };
 
 module.exports.createUser = (req, res) => {
@@ -55,11 +55,12 @@ module.exports.updateAvatar = (req, res) => {
   User.findByIdAndUpdate(_id, { avatar }, {
     new: true,
     runValidators: true,
-    upsert: true,
+    upsert: false,
   })
     .then((result) => isEntityFound(res, result, 'Пользователь не найден'))
     .catch((err) => {
       const possibleErrors = [
+        { name: 'ValidationError', message: 'Некорректная ссылка на аватар', code: 400 },
         { name: 'CastError', message: 'Не корректный id пользователя', code: 400 },
       ];
       chooseError(res, err, possibleErrors);

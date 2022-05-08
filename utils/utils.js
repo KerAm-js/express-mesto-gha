@@ -9,8 +9,8 @@ module.exports.isEntityFound = (res, result, errorMessage) => {
 module.exports.chooseError = (res, err, possibleErrors) => {
   const currentErr = possibleErrors.find((possibleErr) => possibleErr.name === err.name);
   if (currentErr) {
-    res.status(currentErr.code).send({ ...err, message: currentErr.message });
+    res.status(currentErr.code).send({ message: currentErr.message });
     return;
   }
-  res.status(500).send({ message: err.message, ...err });
+  res.status(500).send({ message: err.message });
 };
