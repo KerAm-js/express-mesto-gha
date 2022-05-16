@@ -1,3 +1,5 @@
+const bcrypt = require('bcrypt');
+const validator = require('validator');
 const User = require('../models/user');
 const { chooseError, isEntityFound } = require('../utils/utils');
 
@@ -8,8 +10,14 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
+  const { name, about, avatar, email } = req.body;
+  if (!validator.default.isEmail(email)) {
+    res.status(400).send({ message: 'Некорректные данные пользователя' });
+    return;
+  }
+
+  bcrypt.hash(req.body.password, 10)
+    .then((hash) => User.create({ name, about, avatar, email, password: hash }))
     .then((result) => res.status(201).send(result))
     .catch((err) => {
       const possibleErrors = [

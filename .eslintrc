@@ -9,6 +9,10 @@
           "_id"
         ]
       }
-    ]
+    ],
+    "object-curly-newline": ["error", {
+      "ObjectPattern": { "multiline": true },
+      "ExportDeclaration": { "multiline": true, "minProperties": 3 }
+    }]
   }
 }
