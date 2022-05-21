@@ -47,8 +47,8 @@ module.exports.getUserById = (req, res) => {
 
 module.exports.updateProfile = (req, res) => {
   const { name, about } = req.body;
-  const { _id } = req.user;
-  User.findByIdAndUpdate(_id, { name, about }, {
+  const currentUser = req.user;
+  User.findByIdAndUpdate(currentUser, { name, about }, {
     new: true,
     runValidators: true,
     upsert: false,
@@ -65,8 +65,8 @@ module.exports.updateProfile = (req, res) => {
 
 module.exports.updateAvatar = (req, res) => {
   const { avatar } = req.body;
-  const { _id } = req.user;
-  User.findByIdAndUpdate(_id, { avatar }, {
+  const currentUser = req.user;
+  User.findByIdAndUpdate(currentUser, { avatar }, {
     new: true,
     runValidators: true,
     upsert: false,
@@ -109,5 +109,20 @@ module.exports.login = (req, res) => {
     })
     .catch((e) => {
       res.status(500).send({ message: e.message });
+    });
+};
+
+module.exports.getUserInfo = (req, res) => {
+  const currentUser = req.user;
+  User.findById(currentUser)
+    .then((user) => {
+      if (!user) {
+        res.status(404).send({ message: 'Пользователь не найден' });
+        return;
+      }
+      res.status(200).send(user);
+    })
+    .catch((err) => {
+      res.status(500).send({ message: err.message });
     });
 };
