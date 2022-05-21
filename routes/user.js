@@ -3,7 +3,8 @@ const userController = require('../controllers/user');
 
 router.get('/', userController.getUsers);
 router.get('/:userId', userController.getUserById);
-router.post('/', userController.createUser);
+router.post('/signup', userController.createUser);
+router.post('./signin', userController.login);
 router.patch('/me', userController.updateProfile);
 router.patch('/me/avatar', userController.updateAvatar);
 
