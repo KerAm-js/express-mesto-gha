@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cookieParser = require('cookie-parser');
 const { errors, celebrate, Joi } = require('celebrate');
 const userRouter = require('./routes/user');
 const cardRouter = require('./routes/card');
@@ -17,6 +18,7 @@ const app = express();
 const { PORT = 3000 } = process.env;
 
 app.use(express.json());
+app.use(cookieParser());
 app.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),

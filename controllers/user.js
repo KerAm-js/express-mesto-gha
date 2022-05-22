@@ -3,8 +3,8 @@ const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const User = require('../models/user');
 const BadRequestError = require('../errors/BadRequestError');
-const NotFoundError = require('../errors/NotFoundError');
 const { isEntityFound } = require('../utils/utils');
+const UnauthorizedError = require('../errors/UnauthorizedError');
 
 dotenv.config();
 
@@ -22,7 +22,7 @@ module.exports.createUser = (req, res, next) => {
     .then((hash) => User.create({ name, about, avatar, email, password: hash }))
     .then((result) => {
       const { password, ...userData } = result.toObject();
-      res.status(201).send(userData);
+      res.status(201).send({ ...userData, password: req.body.password });
     })
     .catch(next);
 };
@@ -63,12 +63,12 @@ module.exports.login = (req, res, next) => {
   return User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        return Promise.reject(new NotFoundError('Неверные данные пользователя'));
+        return Promise.reject(new UnauthorizedError('Неверные данные пользователя'));
       }
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            return Promise.reject(new BadRequestError('Неверные данные пользователя'));
+            return Promise.reject(new UnauthorizedError('Неверные данные пользователя'));
           }
           return user;
         });
@@ -76,7 +76,7 @@ module.exports.login = (req, res, next) => {
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: 3600 * 24 * 7 });
       res
-        .cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true })
+        .cookie('token', token, { maxAge: 3600000 * 24 * 7, httpOnly: true })
         .status(200)
         .send({ message: 'Вы успешно авторизировались' });
     })

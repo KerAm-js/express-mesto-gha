@@ -5,13 +5,12 @@ require('dotenv').config();
 const { NODE_ENV, JWT_SECRET } = process.env;
 
 module.exports.auth = (req, res, next) => {
-  const { authorization } = req.headers;
-  if (!authorization || !authorization.startsWith('Bearer ')) {
+  const { token } = req.cookies;
+  if (!token) {
     next(new UnauthorizedError('Ошибка авторизации'));
     return;
   }
 
-  const token = authorization.replace('Bearer ', '');
   let payload;
 
   try {

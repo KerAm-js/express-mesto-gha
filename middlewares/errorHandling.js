@@ -3,8 +3,8 @@ const errorHandling = (err, req, res, next) => {
     res.status(409).send({ message: 'Пользователь с таким email уже существует' });
     return;
   }
-  if (err.errors) {
-    res.status(400).send({ message: err.message.split(':')[2] });
+  if (err.errors || err.name === 'ValidationError') {
+    res.status(400).send({ message: err.message });
     return;
   }
   res.status(err.statusCode || 500).send({ message: err.message });
