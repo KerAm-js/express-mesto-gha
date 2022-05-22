@@ -13,6 +13,9 @@ module.exports.deleteCardById = (req, res, next) => {
   const { cardId } = req.params;
   Card.findById(cardId)
     .then((card) => {
+      if (!card) {
+        return Promise.reject(new NotFoundError('Карточка не найдена'));
+      }
       if (card.owner.toString() !== req.user._id) {
         return Promise.reject(new ForbiddenError('У вас недостаточно прав'));
       }

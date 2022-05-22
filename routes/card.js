@@ -1,13 +1,14 @@
 const router = require('express').Router();
 const { Joi, celebrate } = require('celebrate');
 const cardController = require('../controllers/card');
+const { myRegex } = require('../utils/utils');
 
 router.get('/', cardController.getCards);
 
 router.post('/', celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().pattern(/(https?:\/\/)(www\.)?([\da-z\.\-]+)\.([a-z\.]{2,6})(\/[\da-z\-\._~:\/?#\[\]@!$&'\(\)*+,;=])*#?/),
+    link: Joi.string().required().pattern(new RegExp(myRegex)),
   }).unknown(true),
 }), cardController.createCard);
 

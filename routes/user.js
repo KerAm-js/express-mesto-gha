@@ -1,18 +1,11 @@
 const router = require('express').Router();
 const { Joi, celebrate } = require('celebrate');
 const userController = require('../controllers/user');
+const { myRegex } = require('../utils/utils');
 
 router.get('/', userController.getUsers);
 
-router.get('/me', celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
-    avatar: Joi.string().pattern(/(https?:\/\/)(www\.)?([\da-z\.\-]+)\.([a-z\.]{2,6})(\/[\da-z\-\._~:\/?#\[\]@!$&'\(\)*+,;=])*#?/),
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
-  }).unknown(true),
-}), userController.getUserInfo);
+router.get('/me', userController.getUserInfo);
 
 router.get('/:userId', celebrate({
   params: Joi.object().keys({
@@ -24,7 +17,7 @@ router.patch('/me', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().pattern(/(https?:\/\/)(www\.)?([\da-z\.\-]+)\.([a-z\.]{2,6})(\/[\da-z\-\._~:\/?#\[\]@!$&'\(\)*+,;=])*#?/),
+    avatar: Joi.string().pattern(new RegExp(myRegex)),
     email: Joi.string().email(),
     password: Joi.string().min(8),
   }).unknown(true),
@@ -32,7 +25,7 @@ router.patch('/me', celebrate({
 
 router.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string(),
+    avatar: Joi.string().pattern(new RegExp(myRegex)),
   }).unknown(true),
 }), userController.updateAvatar);
 
