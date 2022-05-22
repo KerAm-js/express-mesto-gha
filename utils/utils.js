@@ -1,16 +1,8 @@
+const NotFoundError = require('../errors/NotFoundError');
+
 module.exports.isEntityFound = (res, result, errorMessage) => {
   if (!result) {
-    res.status(404).send({ message: errorMessage });
-    return;
+    return Promise.reject(new NotFoundError(errorMessage));
   }
-  res.send(result);
-};
-
-module.exports.chooseError = (res, err, possibleErrors) => {
-  const currentErr = possibleErrors.find((possibleErr) => possibleErr.name === err.name);
-  if (currentErr) {
-    res.status(currentErr.code).send({ message: currentErr.message });
-    return;
-  }
-  res.status(500).send({ message: err.message });
+  return res.status(200).send(result);
 };

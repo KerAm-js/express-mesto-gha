@@ -1,38 +1,41 @@
+const ForbiddenError = require('../errors/ForbiddenError');
+const NotFoundError = require('../errors/NotFoundError');
 const Card = require('../models/card');
-const { chooseError, isEntityFound } = require('../utils/utils');
+const { isEntityFound } = require('../utils/utils');
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find()
     .then((cards) => res.send(cards))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch(next);
 };
 
-module.exports.deleteCardById = (req, res) => {
+module.exports.deleteCardById = (req, res, next) => {
   const { cardId } = req.params;
-  Card.findByIdAndRemove(cardId)
-    .then((card) => isEntityFound(res, card, 'Карточка не найдена'))
-    .catch((err) => {
-      const possibleErrors = [
-        { name: 'CastError', message: 'Некорректные данные карточки', code: 400 },
-      ];
-      chooseError(res, err, possibleErrors);
-    });
+  Card.findById(cardId)
+    .then((card) => {
+      if (card.owner.toString() !== req.user._id) {
+        return Promise.reject(new ForbiddenError('У вас недостаточно прав'));
+      }
+      return Card.findByIdAndRemove(cardId);
+    })
+    .then((card) => {
+      if (!card) {
+        return Promise.reject(NotFoundError('Карточка не найдена'));
+      }
+      return res.status(200).send(card);
+    })
+    .catch(next);
 };
 
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
   const currentUser = req.user;
   Card.create({ name, link, owner: currentUser })
     .then((result) => res.status(201).send(result))
-    .catch((err) => {
-      const possibleErrors = [
-        { name: 'ValidationError', message: 'Некорректные данные карточки', code: 400 },
-      ];
-      chooseError(res, err, possibleErrors);
-    });
+    .catch(next);
 };
 
-module.exports.likeCard = (req, res) => {
+module.exports.likeCard = (req, res, next) => {
   const { cardId } = req.params;
   Card.findByIdAndUpdate(cardId, {
     $addToSet: {
@@ -40,15 +43,10 @@ module.exports.likeCard = (req, res) => {
     },
   }, { new: true })
     .then((result) => isEntityFound(res, result, 'Карточка не найдена'))
-    .catch((err) => {
-      const possibleErrors = [
-        { name: 'CastError', message: 'Некорректный id карточки', code: 400 },
-      ];
-      chooseError(res, err, possibleErrors);
-    });
+    .catch(next);
 };
 
-module.exports.dislikeCard = (req, res) => {
+module.exports.dislikeCard = (req, res, next) => {
   const { cardId } = req.params;
   Card.findByIdAndUpdate(cardId, {
     $pull: {
@@ -56,10 +54,5 @@ module.exports.dislikeCard = (req, res) => {
     },
   }, { new: true })
     .then((result) => isEntityFound(res, result, 'Карточка не найдена'))
-    .catch((err) => {
-      const possibleErrors = [
-        { name: 'CastError', message: 'Некорректный id карточки', code: 400 },
-      ];
-      chooseError(res, err, possibleErrors);
-    });
+    .catch(next);
 };
