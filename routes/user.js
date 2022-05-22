@@ -25,8 +25,8 @@ router.patch('/me', celebrate({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
     avatar: Joi.string().pattern(/(https?:\/\/)(www\.)?([\da-z\.\-]+)\.([a-z\.]{2,6})(\/[\da-z\-\._~:\/?#\[\]@!$&'\(\)*+,;=])*#?/),
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
+    email: Joi.string().email(),
+    password: Joi.string().min(8),
   }).unknown(true),
 }), userController.updateProfile);
 

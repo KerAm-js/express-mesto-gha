@@ -7,6 +7,10 @@ const errorHandling = (err, req, res, next) => {
     res.status(400).send({ message: err.message });
     return;
   }
+  if (err.name === 'CastError') {
+    res.status(404).send({ message: err.message });
+    return;
+  }
   res.status(err.statusCode || 500).send({ message: err.message });
   next();
 };
